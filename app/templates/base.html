@@ -1,0 +1,14 @@
+<html>
+    <head>
+      {% if title %}
+      <title>{{ title }} - VideoLabelingTool</title>
+      {% else %}
+      <title>VideoLabelingTool</title>
+      {% endif %}
+    </head>
+    <body>
+        <div>VideoLabelingTool: <a href="/index">Home</a></div>
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>

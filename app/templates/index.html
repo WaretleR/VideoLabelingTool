@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <button name="choose_dataset">Choose dataset...</button>
+    {% for ds in datasets %}
+        <div>
+            <p>
+                <a onclick="openDataset()">
+                    <b>{{ ds.name }}</b>
+                </a>
+            </p>
+            <p>
+                {{ ds.path }}
+            </p>
+        </div>
+    {% endfor %}
+{% endblock %}
