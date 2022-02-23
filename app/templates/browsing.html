@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h2 class="list_header" id="videos">
+        Videos
+    </h2>
+    <h2 class="list_header" id="classes">
+        Classes
+    </h2>
+    <h2 class="list_header" id="actions">
+        Actions
+    </h2>
+
+    {% for v in videos %}
+        <div>
+            <p>
+                <a>{{ v.name }}</a>
+            </p>
+            <p>
+                {{ v.length }}
+            </p>
+        </div>
+    {% endfor %}
+
+    {% for c in classes %}
+        <div>
+            <p>
+                <a>{{ c.name }}</a>
+            </p>
+            <p>
+                {{ c.amount }}
+            </p>
+        </div>
+    {% endfor %}
+
+    {% for a in actions %}
+        <div>
+            <p>
+                <a>{{ a.name }}</a>
+            </p>
+            <p>
+                {{ a.amount }}
+            </p>
+        </div>
+    {% endfor %}
+
+    <button id="back">
+        Back
+    </button>
+    <button id="properties">
+        Properties
+    </button>
+    <button id="metrics">
+        Metrics
+    </button>
+    <button id="add_actions">
+        Add actions
+    </button>
+    
+{% endblock %}
