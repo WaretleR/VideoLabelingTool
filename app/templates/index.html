@@ -5,7 +5,7 @@
     {% for ds in datasets %}
         <div>
             <p>
-                <a onclick="openDataset()">
+                <a href={{ url_for("labeling", datasetFolder = ds.path, videoName = ds.first_video) }}>
                     <b>{{ ds.name }}</b>
                 </a>
             </p>

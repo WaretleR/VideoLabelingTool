@@ -1,0 +1,11 @@
+#videoPlayer {
+    top: 50px;
+    left: 200px;
+    position: absolute;
+}
+
+#canvas {
+    top: 50px;
+    left: 200px;
+    position: absolute;
+}
