@@ -10,14 +10,18 @@ import os
 DEBUG = True
 
 # instantiate the app
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 app.config.from_object(__name__)
 
 # enable CORS
-CORS(app)
+CORS(app, resources={r'/*': {'origins': '*'}})
 
 actionStorage = ActionStorage()
 currentVideo = 'VIRAT_S_010204_04_000646_000754.mp4'
+
+@app.route('/ping', methods=['GET'])
+def ping_pong():
+    return jsonify('pong!')
 
 @app.route('/actions', methods=['GET', 'POST'])
 def all_actions():
@@ -34,6 +38,7 @@ def all_actions():
             'tracking_conf' : 1.0,
             'classification_conf' : 1.0,
             'approved' : True,
+            'selected' : False,
             'framesDict': {}
         })
 
@@ -42,6 +47,20 @@ def all_actions():
 
     print(response_object['actions'])
     return jsonify(response_object)
+
+
+@app.route('/videos', methods=['GET'])
+def all_videos():
+    response_object = {'status': 'success'}
+
+    if request.method == 'GET':
+        videoName = request.args.get("name")
+        response_object['videoPath'] = os.paht.join('videos', videoName + '.mp4')
+
+
+    return jsonify(response_object)
+
+
 
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):

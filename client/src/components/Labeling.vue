@@ -1,9 +1,7 @@
 <template>
-  <div class="container">
-    <video controls controlsList="nofullscreen" disablepictureinpicture
-     width="1280" height="720" id="videoPlayer">
-        <source type="video/mp4">
-    </video>
+  <div class="labeling">
+    <video-player class="video-player-box"></video-player>
+
     <div class="row">
       <div class="col-sm-10">
         <h1>Actions</h1>
@@ -15,12 +13,12 @@
          v-b-modal.action-modal>
           Add Action
         </button>
-        
+
         <button
          type="button"
          class="btn btn-success btn-sm">
           Save
-        </button> 
+        </button>
 
         <br><br>
         <table class="table table-hover">
@@ -29,9 +27,9 @@
               <th scope="col">Class</th>
               <th scope="col">Start</th>
               <th scope="col">End</th>
-              <th scope="col">Detection conf</th>
-              <th scope="col">Tracking conf</th>
-              <th scope="col">Classification conf</th>
+              <th scope="col">Detect</th>
+              <th scope="col">Track</th>
+              <th scope="col">Class</th>
               <th></th>
             </tr>
           </thead>
@@ -94,13 +92,75 @@
         <b-button type="reset" variant="danger">Reset</b-button>
       </b-form>
     </b-modal>
+    <selection class="labeling-box"></selection>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import Vue from 'vue';
+import VideoPlayer from './VideoPlayer.vue'
+
+Vue.component('selection', {
+  template: "<canvas id='canvas' ref='select' @mousedown='startSelect' @mousemove='drawRect' @mouseup='stopSelect'></canvas>",
+  data() {
+    return {
+      ctx: null,
+      selectionMode: false,
+      startPosition: {
+        x: null,
+        y: null,
+      },
+    };
+  },
+
+  methods: {
+
+    startSelect(e) {
+      this.selectionMode = true;
+      this.startPosition.x = e.clientX - 10;
+      this.startPosition.y = e.clientY - 10;
+    },
+
+    drawRect(e) {
+      if (this.selectionMode) {
+        this.ctx.beginPath();
+        this.ctx.rect(
+          this.startPosition.x,
+          this.startPosition.y,
+          e.clientX - 10 - this.startPosition.x,
+          e.clientY - 10 - this.startPosition.y,
+        );
+        this.ctx.closePath();
+        this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+        this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        this.ctx.strokeStyle = '#f00';
+        this.ctx.stroke();
+      }
+    },
+
+    stopSelect(e) {
+      this.ctx.fillStyle = '#fff';
+
+      this.selectionMode = false;
+      this.startPosition.x = null;
+      this.startPosition.y = null;
+    }
+  
+  },
+  mounted() {
+    this.$refs.select.height = 576;
+    this.$refs.select.width = 1024;
+    this.ctx = this.$refs.select.getContext('2d');
+    // this.ctx.fillRect(0,0,500,500);
+  }
+});
 
 export default {
+  components: {
+    'video-player' : VideoPlayer,
+  },
+
   data() {
     return {
       actions: [],
@@ -111,6 +171,7 @@ export default {
       },
     };
   },
+
   methods: {
     getActions() {
       const path = 'http://localhost:5000/actions';
@@ -120,7 +181,6 @@ export default {
         })
         .catch((error) => {
           // eslint-отключение следующей строки
-          console.error(error);
         });
     },
     addAction(payload) {
@@ -131,7 +191,6 @@ export default {
         })
         .catch((error) => {
           // eslint-отключение следующей строки
-          console.log(error);
           this.getActions();
         });
     },
@@ -161,3 +220,18 @@ export default {
   },
 };
 </script>
+
+<style>
+.row{
+  width:auto; height:auto;
+  position:absolute; top:10px; left:1084px;
+}
+.video-player-box{
+  width:1024px; height:576px;
+  position:absolute; top:10px; left:10px;
+}
+.labeling-box{
+  width:1024px; height:576px;
+  position:absolute; top:10px; left:10px;
+}
+</style>

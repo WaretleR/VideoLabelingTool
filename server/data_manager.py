@@ -1,7 +1,7 @@
 import os
 import json
 
-DATA_PATH = 'data'
+DATA_PATH = os.path.join('static', 'data')
 
 class EventInfo():
     def __init__(self, type, start, end, detection_conf = 1.0, tracking_conf = 1.0, classification_conf = 1.0, approved = True, framesDict = {}):
