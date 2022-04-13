@@ -1,8 +1,9 @@
+from email.policy import default
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask.json import JSONEncoder
 
-from data_manager import ActionStorage, EventInfo
+from data_manager import ActionStorage, ActionInfo, VideoInfo
 
 import os
 
@@ -16,36 +17,29 @@ app.config.from_object(__name__)
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-actionStorage = ActionStorage()
-currentVideo = 'VIRAT_S_010204_04_000646_000754.mp4'
+currentDataset = 'VIRAT'
+actionStorage = ActionStorage(currentDataset)
+currentVideo = actionStorage.getNames()[0]
 
 @app.route('/ping', methods=['GET'])
 def ping_pong():
     return jsonify('pong!')
 
-@app.route('/actions', methods=['GET', 'POST'])
+@app.route('/actions', methods=['GET', 'PUT'])
 def all_actions():
     response_object = {'status': 'success'}
 
-    if request.method == 'POST':
+    if request.method == 'PUT':
         post_data = request.get_json()
 
-        actionStorage.addAction(currentVideo, {
-            'type': post_data.get('type'),
-            'start' : post_data.get('start'),
-            'end' : post_data.get('end'),
-            'detection_conf' : 1.0,
-            'tracking_conf' : 1.0,
-            'classification_conf' : 1.0,
-            'approved' : True,
-            'selected' : False,
-            'framesDict': {}
-        })
+        actionStorage.saveActions(post_data)
+
+        actionStorage.update(currentDataset)
+        #response_object['actions'] = actionStorage.getActions(request.args.get("video", default=''))
 
     else:
-        response_object['actions'] = actionStorage.getActions()
+        response_object['actions'] = actionStorage.getActions(request.args.get("video", default=''))
 
-    print(response_object['actions'])
     return jsonify(response_object)
 
 
@@ -54,9 +48,12 @@ def all_videos():
     response_object = {'status': 'success'}
 
     if request.method == 'GET':
-        videoName = request.args.get("name")
-        response_object['videoPath'] = os.paht.join('videos', videoName + '.mp4')
-
+        datasetName = request.args.get("dataset")
+        if datasetName == currentDataset:
+            response_object['names'] = actionStorage.getNames()
+        else:
+            # TODO all datasets should be loaded
+            pass
 
     return jsonify(response_object)
 
@@ -64,7 +61,7 @@ def all_videos():
 
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, EventInfo):
+        if isinstance(obj, (ActionInfo, VideoInfo)):
             return obj.__dict__
         return JSONEncoder.default(self, obj)
 

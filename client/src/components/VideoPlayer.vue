@@ -1,6 +1,6 @@
 <template>
     <div class='video-player-box'>
-        <video id="video-html-player" width='1024' height='576'> <source :src='mp4' type='video/mp4'></video>
+        <video id="video-html-player" width='1024' height='576'> <source id="video-html-source" :src='videoPath' type='video/mp4'></video>
         <div id="video-controls" class="controls" data-state="visible">
             <button id="playpause" type="button" data-state="play">Play/Pause</button>
             <button id="stop" type="button" data-state="stop">Stop</button>
@@ -17,13 +17,19 @@
 <script>
     export default {
         data() {
-            return {
-            mp4: "http://localhost:5000/static/data/videos/VIRAT_S_010204_04_000646_000754.mp4"
+            return {}
+        },
+        props: ['videoPath'],
+        watch: {
+            videoPath: function(newVal, oldVal) {
+                var video = document.getElementById('video-html-player');
+                var playpause = document.getElementById('playpause');
+
+                video.load();
+                playpause.setAttribute('data-state', 'play');
             }
         },
-        methods:
-        {
-
+        methods: {
         },
         mounted() {
             // Obtain handles to main elements
@@ -112,6 +118,7 @@
             mute.addEventListener('click', function(e) {
                 video.muted = !video.muted;
                 changeButtonState('mute');
+                console.log(document.getElementById('video-html-source').getAttribute('src'));
             });
 
             // As the video is playing, update the progress bar
@@ -125,7 +132,7 @@
             // React to the user clicking within the progress bar
             progress.addEventListener('click', function(e) {
                 //var pos = (e.pageX  - this.offsetLeft) / this.offsetWidth; // Also need to take the parent into account here as .controls now has position:relative
-                var pos = (e.pageX  - (this.offsetLeft + this.offsetParent.offsetLeft)) / this.offsetWidth;
+                var pos = (e.pageX  - (this.offsetLeft + this.offsetParent.offsetLeft + this.offsetParent.offsetParent.offsetLeft)) / this.offsetWidth;
                 video.currentTime = pos * video.duration;
             });
         },
@@ -279,7 +286,7 @@
         }
         .controls .progress {
             /*display:table-caption;*/ /* this trick doesn't work as elements are floated and the layout doesn't work */
-            position:absolute;
+            position:relative;
             top:0;
             width:100%;
             float:none;

@@ -1,4 +1,7 @@
-data/
+static/
+facebookTimesformer/
+timesformer/
+runs/
 __pycache__/
 
 # Editor directories and files
@@ -8,3 +11,4 @@ __pycache__/
 *.ntvs*
 *.njsproj
 *.sln
+*.pickle
